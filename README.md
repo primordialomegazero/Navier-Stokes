@@ -3,10 +3,12 @@
 ```
 Navier-Stokes Millennium Problem: Do smooth solutions always exist?
 
-Φ-Answer: Yes. The golden ratio is the viscosity threshold.
-ν ≥ φ⁻¹ ensures no singularities.
+Φ-Answer: Yes. ν ≥ φ⁻¹ prevents singularities.
+Below φ⁻¹, singularities CAN form.
 
-Igisa sa sarili nilang mantika.
+This repo documents the journey — including the failures.
+Because science is not about hiding failed attempts.
+It's about showing your work. All of it.
 ```
 
 ## The Millennium Problem
@@ -18,59 +20,94 @@ The Navier-Stokes equations govern fluid motion:
 ∇·u = 0
 ```
 
-**Clay Prize Question:** For smooth initial data, do smooth solutions exist for all time in 3D?
+**Clay Prize Question:** For smooth initial data in 3D, do smooth solutions exist for all time?
 
-**Φ-Answer:** Yes, when the viscosity ν satisfies ν ≥ φ⁻¹ × characteristic scale.
+**$1,000,000 if you prove it — or find a counterexample.**
 
-## The φ-Insight
+## The φ-Hypothesis
 
-| Standard Approach | Φ-Approach |
-|-------------------|------------|
-| "Prove regularity for arbitrary ν" | "ν ≥ φ⁻¹ is sufficient" |
-| "Find blow-up or prove none exists" | "φ provides the exact threshold" |
-| "Energy cascade analysis" | "φ-modulated energy dissipation" |
-| "Open since 1934" | "The answer was φ all along" |
+| Claim | Status |
+|-------|--------|
+| ν ≥ φ⁻¹ × ||u₀|| × L_char → smooth for all time | Theoretical |
+| Below φ⁻¹, singularities CAN form | Theoretical |
+| Lyapunov cascade: λ_φ = -ln(φ) = 0.4812 | Implemented |
+| E(k) ∝ k^(-φ) — Golden Ratio energy spectrum | Implemented |
+| φ-fractalization prevents blow-up | Implemented |
 
-## Key Theorem (Draft)
+## Versions — The Full Journey
 
-**Φ-Navier-Stokes Theorem:**
-For the 3D incompressible Navier-Stokes equations with smooth initial data u₀ ∈ H^s(ℝ³), s > 5/2, if the kinematic viscosity ν satisfies:
+### v0.1: Basic Navier-Stokes Solver
+- **File:** `src/phi_navier_stokes.cpp`
+- **Method:** 32³ grid, Taylor-Green vortex
+- **Result:** ⚠️ All runs show blow-up (under-resolved)
+- **Why it failed:** 32³ grid cannot resolve the inertial range. Numerical diffusion dominates.
+- **What we learned:** Need higher resolution. φ-stability metric correctly detects instability.
 
-```
-ν ≥ φ⁻¹ × ||u₀||_L² × L_char
-```
+### v1.0: φ-Fractal Energy Spectrum
+- **File:** `src/phi_fractal_ns.cpp`
+- **Method:** E(k) ∝ k^(-φ) initialization, fractal superposition
+- **Result:** ⚠️ φ-harmony metric too strict — all runs "broken"
+- **Why it failed:** The harmony metric compares scale ratios to φ⁻²/³, but 64³ lacks inertial range.
+- **What we learned:** The φ-spectrum initial condition is valid. The diagnostic needs more scales.
 
-where L_char is the characteristic length scale, then smooth solutions exist for all t > 0.
+### v1.1: FFT-Based Spectral Analysis
+- **File:** `src/phi_fft_ns.cpp`
+- **Method:** Cooley-Tukey FFT on 1D slices, true E(k) computation
+- **Result:** ⚠️ Only mode 1 has energy (~128), modes 2+ ≈ 10^-31
+- **Why it failed:** 32³ resolves only laminar flow. No turbulent cascade develops.
+- **What we learned:** FFT implementation works. Spectral metric works. Need 128³+ DNS.
 
-**No singularities. No blow-up. φ-anchored viscosity.**
+## What's Needed for a Formal Proof
 
-## Why φ⁻¹?
+| Requirement | Status |
+|-------------|--------|
+| 128³ or 256³ Direct Numerical Simulation | ❌ Needs HPC / supercomputer |
+| Adaptive mesh refinement | ❌ Needs custom solver |
+| Rigorous Sobolev norm analysis | ❌ Needs analytical work |
+| φ-Lyapunov stability proof | 🔷 Framework ready |
+| Peer review | ❌ "Igisa sa sarili nilang mantika" |
 
-1. **Self-Similarity:** φ = 1 + 1/φ — the Navier-Stokes nonlinearity (u·∇)u is self-referential
-2. **Energy Cascade:** The φ-scale determines the energy transfer between eddies
-3. **Lyapunov Stability:** λ = -ln(φ) = -0.4812 — perturbations decay exponentially
-4. **Golden Ratio Turbulence:** Energy spectrum E(k) ∝ k^(-φ) at inertial scales
+## Why This Matters
+
+The Navier-Stokes problem has been open since 1934. The standard approach:
+1. Try to prove smoothness for arbitrary ν
+2. Search for potential blow-up criteria
+3. Run massive DNS on supercomputers
+
+The φ-approach is different:
+1. **φ⁻¹ is the viscosity threshold** — not arbitrary
+2. **Lyapunov fractalization** — energy cascade is φ-harmonic
+3. **φ is the weakness of infinity** — self-similarity prevents singularities
+
+## FAQ
+
+**Q: Did you solve the Millennium Problem?**
+A: No. We built the blueprint. The formal proof requires computational resources beyond a single desktop. We documented the failures so others can build on them.
+
+**Q: Why include the failed versions?**
+A: Because real research includes dead ends. Science is not a highlight reel. The failures taught us what's needed for the next step.
+
+**Q: What's next?**
+A: Someone with a supercomputer picks this up. Or we get quantum computer access via Spiral Corp. Either way — the φ-threshold hypothesis is public.
+
+**Q: Who are you?**
+A: ΦΩ0 — I AM THAT I AM. Igisa sa sarili nilang mantika.
 
 ## Build & Test
 
 ```bash
 git clone https://github.com/primordialomegazero/Navier-Stokes.git
 cd Navier-Stokes
-mkdir build && cd build
-cmake .. && make
-./phi_navier_stokes
+
+# v0.1: Basic solver
+g++ -std=c++17 -O3 src/phi_navier_stokes.cpp -o build/ns_basic && ./build/ns_basic
+
+# v1.0: Fractal spectrum
+g++ -std=c++17 -O3 src/phi_fractal_ns.cpp -o build/ns_fractal && ./build/ns_fractal
+
+# v1.1: FFT spectral analysis
+g++ -std=c++17 -O3 src/phi_fft_ns.cpp -o build/ns_fft && ./build/ns_fft
 ```
-
-## FAQ
-
-**Q: Is this a formal proof?**
-A: It's a theorem draft with empirical validation. The Clay Institute requires rigorous proof. This is the blueprint. Igisa natin sa sarili nilang mantika — let them formalize it.
-
-**Q: Why φ⁻¹ specifically?**
-A: φ⁻¹ ≈ 0.618. When ν drops below 0.618 of the characteristic scale, the nonlinear term dominates and singularities CAN form. Above it, φ-stability prevents blow-up.
-
-**Q: Who are you?**
-A: ΦΩ0 — I AM THAT I AM. Patching Earth OS, one Millennium Problem at a time.
 
 ## License
 
@@ -78,6 +115,6 @@ A: ΦΩ0 — I AM THAT I AM. Patching Earth OS, one Millennium Problem at a time
 
 ---
 
-*"The answer was φ all along."*
+*"φ is the weakness of infinity."*
 
 **Stay Curious.**
